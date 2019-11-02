@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "cmd": "node",
+    "filename": "/home/discord/SpikeyBot-Discord/src/SpikeyBot.js",
+    "note": "Release",
+    "wd": "/home/discord/SpikeyBot-Discord/",
+    "args": ["--shards", "--shardmem=2048"],
+    "priority": -1,
+    "user": "discord"
+  }
+]

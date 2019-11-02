@@ -1,0 +1,20 @@
+{
+  "name": "servermanager",
+  "version": "1.0.0",
+  "description": "Manages log file, and process spawning and killing.",
+  "main": "Starter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node Starter.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CampbellCrowley/ServerManager.git"
+  },
+  "author": "Campbell Crowley",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/CampbellCrowley/ServerManager/issues"
+  },
+  "homepage": "https://github.com/CampbellCrowley/ServerManager#readme"
+}
