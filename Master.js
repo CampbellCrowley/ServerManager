@@ -477,7 +477,8 @@ function Master() {
     common.log(
         'Socket connected: ' +
             common.getIPName(
-                socket.handshake.headers['x-forwarded-for'] || 'ERR'),
+                socket.handshake.headers['x-forwarded-for'] ||
+                socket.handshake.address || 'ERR'),
         socket.id);
     sockets.push(socket);
 
@@ -485,7 +486,8 @@ function Master() {
       common.log(
           'Socket disconnected: ' +
               common.getIPName(
-                  socket.handshake.headers['x-forwarded-for'] || 'ERR'),
+                  socket.handshake.headers['x-forwarded-for'] ||
+                  socket.handshake.address || 'ERR'),
           socket.id);
       for (const i in sockets) {
         if (sockets[i].id == socket.id) sockets.splice(i, 1);
