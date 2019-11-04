@@ -8,6 +8,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const config = require('./config.js').master;
+const sIoClient = require('socket.io-client');
 
 /**
  * @classdesc Start, stops, and restarts all server processes and monitors their
@@ -15,8 +16,8 @@ const config = require('./config.js').master;
  * @class
  */
 function Master() {
-  let app = http.createServer(handler);
-  let io = require('socket.io')(
+  const app = http.createServer(handler);
+  const io = require('socket.io')(
       app, {path: config.socket.path, serveClient: true});
   common.begin();
 
@@ -36,7 +37,7 @@ function Master() {
    * @private
    * @type {Socket[]}
    */
-  let sockets = [];
+  const sockets = [];
 
   /**
    * Default current working directory of a child. May be overriden in
@@ -55,7 +56,7 @@ function Master() {
    * @type {{cwd: string}}
    * @default
    */
-  let options = {cwd: cwd, stdio: ['inherit', 'pipe', 'pipe']};
+  const options = {cwd: cwd, stdio: ['inherit', 'pipe', 'pipe']};
 
   /**
    * List of all servers we are to spawn as child processes. Parsed from
@@ -81,18 +82,43 @@ function Master() {
    * @private
    * @type {Object.<Object>}
    */
-  let currentServers = {};
+  const currentServers = {};
 
   /**
-   * Re-read list of servers from servers.json.
+   * Host information and current socket information for child nodes to fetch
+   * and send requests from and to. Parsed from {@link childrenFile}.
+   *
+   * @private
+   * @type {Array.<{
+   *  id: string,
+   *  hostname: string,
+   *  port: number,
+   *  path: string,
+   *  socket: Socket
+   * }>}
+   */
+  const children = [];
+  /**
+   * Path to the file that stores the information about child node host
+   * information.
+   *
+   * @private
+   * @constant
+   * @default
+   * @type {string}
+   */
+  const childrenFile = `${__dirname}/children.json`;
+
+  /**
+   * Re-read list of servers from servers.json and {@link childrenFile}.
    *
    * @private
    */
   function updateServerList() {
-    fs.readFile('./servers.json', function(err, data) {
+    fs.readFile(`${__dirname}/servers.json`, (err, data) => {
       if (err) return;
       try {
-        let parsed = JSON.parse(data);
+        const parsed = JSON.parse(data);
         if (parsed) {
           previousServerList = serverList.splice(0);
           serverList = parsed;
@@ -102,9 +128,20 @@ function Master() {
         console.log(err);
       }
     });
+    fs.readFile(childrenFile, (err, data) => {
+      if (err) return;
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed) {
+          updateChildren(parsed);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
   }
   updateServerList();
-  fs.watchFile('./servers.json', function(curr, prev) {
+  fs.watchFile(`${__dirname}/servers.json`, (curr, prev) => {
     if (curr.mtime == prev.mtime) return;
     common.log('Re-reading servers from file');
     updateServerList();
@@ -119,7 +156,7 @@ function Master() {
   function updateCurrentServers() {
     // Ensure all servers are running.
     let didSomething = false;
-    for (let i in serverList) {
+    for (const i in serverList) {
       if (!serverList[i]) continue;
       const id = serverList[i].id;
       if (typeof currentServers[id] == 'undefined' ||
@@ -153,19 +190,14 @@ function Master() {
       }
     }
     // Destroy servers that no longer exist.
-    Object.keys(currentServers).forEach(function(key) {
-      if (serverList.findIndex(function(obj) {
-            return obj.id == key;
-          }) < 0) {
+    Object.keys(currentServers).forEach((key) => {
+      if (serverList.findIndex((obj) => obj.id == key) < 0) {
         if (currentServers[key].process) {
-          if (previousServerList
-                  .find(function(obj2) {
-                    return key == obj2.id;
-                  })
-                  .user) {
+          if (previousServerList.find((obj2) => key == obj2.id).user) {
             try {
               process.kill(-currentServers[key].process.pid);
             } catch (err) {
+              // Process is probably already dead.
             }
           } else {
             currentServers[key].process.kill('SIGHUP');
@@ -220,7 +252,7 @@ function Master() {
       options.detached = true;
       forked = spawn(
           'runuser', ['-u', serverList[i].user, '--', cmd, filename].concat(
-                         serverList[i].args),
+              serverList[i].args),
           options);
       options.detached = false;
     } else {
@@ -271,8 +303,8 @@ function Master() {
    * @param {http.ServerResponse} res Our response to the client.
    */
   function handler(req, res) {
-    let conIp =
-        req.connection.remoteAddress.replace(/[^0-9\.]/g, '').split('.');
+    const conIp =
+        req.connection.remoteAddress.replace(/[^0-9.]/g, '').split('.');
     if (!conIp || conIp.length != 4 || conIp[0] != 127 || conIp[1] != 0 ||
         conIp[2] != 0 || conIp[3] != 1) {
       common.error(
@@ -282,22 +314,16 @@ function Master() {
       res.end('Forbidden');
       return;
     }
-    let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
         'ERRR';
     if (req.method == 'GET') {
-      let id = req.url.split('/')[2] || req.headers['server-id'];
+      const id = req.url.split('/')[2] || req.headers['server-id'];
       command(req, res, ip, id);
     } else if (req.method == 'POST') {
       let body = '';
-      req.on('data', function(data) {
-        body += data;
-      });
-      req.on('end', function() {
-        command(req, res, ip, body.replace('id=', ''));
-      });
-      req.on('close', function() {
-        common.log('Request aborted');
-      });
+      req.on('data', (data) => body += data);
+      req.on('end', () => command(req, res, ip, body.replace('id=', '')));
+      req.on('close', () => common.log('Request aborted'));
     } else {
       common.error('INVALID METHOD REQUEST: ' + req.method, ip);
     }
@@ -320,6 +346,7 @@ function Master() {
           try {
             process.kill(-currentServers[id].process.pid);
           } catch (err) {
+            // Process is probably dead already.
           }
         } else {
           currentServers[id].process.kill('SIGHUP');
@@ -350,6 +377,7 @@ function Master() {
           try {
             process.kill(-currentServers[id].process.pid);
           } catch (err) {
+            // Process is probably dead already.
           }
         } else {
           currentServers[id].process.kill('SIGHUP');
@@ -371,12 +399,12 @@ function Master() {
    */
   function get(ip, silent) {
     // if (!silent) common.log("Get", ip);
-    let list = serverList.map(function(obj) {
+    const list = serverList.map((obj) => {
       if (!currentServers[obj.id]) {
         common.error('Failed to get ' + obj.id + ', No file data');
         return;
       }
-      let out = Object.assign({}, obj);
+      const out = Object.assign({}, obj);
       out.wd = path.relative(cwd, out.wd || cwd);
       out.filename = path.relative(cwd, out.filename);
       try {
@@ -445,33 +473,27 @@ function Master() {
     }
   }
 
-  io.on('connection', function(socket) {
+  io.on('connection', (socket) => {
     common.log(
         'Socket connected: ' +
             common.getIPName(socket.handshake.headers['x-forwarded-for']),
         socket.id);
     sockets.push(socket);
 
-    socket.on('disconnect', function() {
+    socket.on('disconnect', () => {
       common.log(
           'Socket disconnected: ' +
               common.getIPName(socket.handshake.headers['x-forwarded-for']),
           socket.id);
-      for (let i in sockets) {
+      for (const i in sockets) {
         if (sockets[i].id == socket.id) sockets.splice(i, 1);
       }
     });
-    socket.on('start', function(id) {
-      reboot(id, socket.id);
-    });
-    socket.on('reboot', function(id) {
-      reboot(id, socket.id);
-    });
-    socket.on('kill', function(id) {
-      kill(id, socket.id);
-    });
-    socket.on('get', function() {
-      socket.emit('get_', get(socket.id));
+    socket.on('start', (id) => reboot(id, socket.id));
+    socket.on('reboot', (id) => reboot(id, socket.id));
+    socket.on('kill', (id) => kill(id, socket.id));
+    socket.on('get', () => {
+      getAll((getList) => socket.emit('get_', getList));
     });
   });
   /**
@@ -480,11 +502,80 @@ function Master() {
    * @private
    */
   function updateAllClients() {
-    const dat = get(null, true);
-    /* eslint-disable-next-line guard-for-in */
-    for (let i in sockets) {
-      sockets[i].emit('get_', dat);
-    }
+    getAll((dat) => {
+      for (const s of sockets) {
+        s.emit('get_', dat);
+      }
+    });
+  }
+
+  /**
+   * Get all information from all children.
+   *
+   * @private
+   * @param {function} cb Callback with single parameter that is an array of
+   * status information.
+   */
+  function getAll(cb) {
+    const total = children.length;
+    let num = 0;
+    const getList = get(null, true);
+    const getDone = function() {
+      if (++num < total) return;
+      cb(getList);
+    };
+
+    children.forEach((el) => {
+      if (el.socket && el.socket.emit) {
+        el.socket.emit('get', (res) => {
+          res.forEach((c) => {
+            c.id = `${el.id}${c.id}`;
+            getList.push(c);
+          });
+          getDone();
+        });
+      } else {
+        getDone();
+      }
+    });
+  }
+
+  /**
+   * Update the socket connections with the children nodes with new host
+   * information.
+   *
+   * @private
+   * @param {Array.<{
+   *  id: string,
+   *  hostname: string,
+   *  port: number,
+   *  path: string,
+   *  socket: Socket
+   * }>} data The new data parsed from file.
+   */
+  function updateChildren(data) {
+    children.filter((c) => {
+      const found = data.find((n) => n.id == c.id);
+      if (!found) {
+        c.socket.end();
+        return false;
+      } else {
+        Object.assign(c, found);
+        return true;
+      }
+    });
+    data.forEach((n) => {
+      const found = children.find((c) => c.id == n.id);
+      if (!found) {
+        n.socket = sIoClient.connect(
+            {hostname: n.hostname, path: n.path, port: n.port});
+        children.push(n);
+      } else if (!found.socket) {
+        found.socket = sIoClient.connect(
+            {hostname: n.hostname, path: n.path, port: n.port});
+      }
+    });
+    updateAllClients();
   }
 
   /**
@@ -494,7 +585,7 @@ function Master() {
    * @private
    */
   function exit() {
-    for (let i in currentServers) {
+    for (const i in currentServers) {
       if (!currentServers[i]) continue;
       currentServers[i].goalState = 'stopped';
 

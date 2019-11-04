@@ -1,0 +1,7 @@
+[
+  {
+    "hostname": "localhost",
+    "port": 86,
+    "path": "/dev.campbellcrowley.com/socket.io/status"
+  }
+]
