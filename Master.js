@@ -557,7 +557,7 @@ function Master() {
     children.filter((c) => {
       const found = data.find((n) => n.id == c.id);
       if (!found) {
-        c.socket.end();
+        c.socket.disconnect();
         common.log('Terminating child connection: ' + c.id);
         return false;
       } else {
