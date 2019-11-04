@@ -558,6 +558,7 @@ function Master() {
       const found = data.find((n) => n.id == c.id);
       if (!found) {
         c.socket.end();
+        common.log('Terminating child connection: ' + c.id);
         return false;
       } else {
         Object.assign(c, found);
@@ -567,10 +568,12 @@ function Master() {
     data.forEach((n) => {
       const found = children.find((c) => c.id == n.id);
       if (!found) {
+        common.log('Creating child connection: ' + n.id);
         n.socket = sIoClient.connect(
             {hostname: n.hostname, path: n.path, port: n.port});
         children.push(n);
       } else if (!found.socket) {
+        common.log('Re-creating child connection: ' + n.id);
         found.socket = sIoClient.connect(
             {hostname: n.hostname, path: n.path, port: n.port});
       }
