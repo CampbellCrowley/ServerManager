@@ -97,7 +97,7 @@ function Master() {
    *  socket: Socket
    * }>}
    */
-  const children = [];
+  let children = [];
   /**
    * Path to the file that stores the information about child node host
    * information.
@@ -476,14 +476,16 @@ function Master() {
   io.on('connection', (socket) => {
     common.log(
         'Socket connected: ' +
-            common.getIPName(socket.handshake.headers['x-forwarded-for']),
+            common.getIPName(
+                socket.handshake.headers['x-forwarded-for'] || 'ERR'),
         socket.id);
     sockets.push(socket);
 
     socket.on('disconnect', () => {
       common.log(
           'Socket disconnected: ' +
-              common.getIPName(socket.handshake.headers['x-forwarded-for']),
+              common.getIPName(
+                  socket.handshake.headers['x-forwarded-for'] || 'ERR'),
           socket.id);
       for (const i in sockets) {
         if (sockets[i].id == socket.id) sockets.splice(i, 1);
@@ -492,8 +494,14 @@ function Master() {
     socket.on('start', (id) => reboot(id, socket.id));
     socket.on('reboot', (id) => reboot(id, socket.id));
     socket.on('kill', (id) => kill(id, socket.id));
-    socket.on('get', () => {
-      getAll((getList) => socket.emit('get_', getList));
+    socket.on('get', (cb) => {
+      getAll((getList) => {
+        if (typeof cb === 'function') {
+          cb(getList);
+        } else {
+          socket.emit('get_', getList);
+        }
+      });
     });
   });
   /**
@@ -517,19 +525,20 @@ function Master() {
    * status information.
    */
   function getAll(cb) {
-    const total = children.length;
+    const total = children.length + 1;
     let num = 0;
     const getList = get(null, true);
     const getDone = function() {
       if (++num < total) return;
       cb(getList);
     };
+    getDone();
 
     children.forEach((el) => {
       if (el.socket && el.socket.emit) {
         el.socket.emit('get', (res) => {
           res.forEach((c) => {
-            c.id = `${el.id}${c.id}`;
+            c.id = `${el.id}-${c.id}`;
             getList.push(c);
           });
           getDone();
@@ -554,7 +563,7 @@ function Master() {
    * }>} data The new data parsed from file.
    */
   function updateChildren(data) {
-    children.filter((c) => {
+    children = children.filter((c) => {
       const found = data.find((n) => n.id == c.id);
       if (!found) {
         c.socket.disconnect();
@@ -566,16 +575,19 @@ function Master() {
       }
     });
     data.forEach((n) => {
-      const found = children.find((c) => c.id == n.id);
+      let found = children.find((c) => c.id == n.id);
       if (!found) {
-        common.log('Creating child connection: ' + n.id);
-        n.socket = sIoClient.connect(
-            {hostname: n.hostname, path: n.path, port: n.port});
+        found = n;
         children.push(n);
-      } else if (!found.socket) {
-        common.log('Re-creating child connection: ' + n.id);
-        found.socket = sIoClient.connect(
-            {hostname: n.hostname, path: n.path, port: n.port});
+      }
+      if (!found.socket) {
+        common.log('Creating child connection: ' + n.id);
+        found.socket =
+            sIoClient.connect(`http://${n.hostname}:${n.port}`, {path: n.path});
+        found.socket.on('connect_error', (err) => {
+          common.error('Connection to child ' + n.id + ' errored.');
+          console.error(err);
+        });
       }
     });
     updateAllClients();
