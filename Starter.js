@@ -38,7 +38,7 @@ function Starter() {
     }
     openLogFile();
     file.write('\nSTARTING MASTER\n');
-    app = spawn('nodejs', ['./Master.js'], {stdio: 'pipe'});
+    app = spawn('nodejs', [`${__dirname}/Master.js`], {stdio: 'pipe'});
     app.on('exit', start);
     app.on('error', file.write);
     app.stderr.pipe(file);
