@@ -1,12 +1,124 @@
 [
   {
+    "id": 0,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/fileServer.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [81],
+    "unstoppable": true
+  },
+  {
     "id": 1,
-    "cmd": "node",
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/stopwatch.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [85]
+  },
+  {
+    "id": 2,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/accounts.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [82]
+  },
+  {
+    "id": 3,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/proxy.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [80, 443],
+    "unstoppable": true
+  },
+  {
+    "id": 4,
+    "cmd": "nodejs",
+    "filename": "/var/www/dev.campbellcrowley.com/trax/trax.js",
+    "wd": "/var/www/dev.campbellcrowley.com/trax/",
+    "note": "Development",
+    "args": [83]
+  },
+  {
+    "id": 5,
+    "cmd": "nodejs",
+    "filename": "/var/www/trax.campbellcrowley.com/trax.js",
+    "wd": "/var/www/trax.campbellcrowley.com/",
+    "note": "Release",
+    "args": [84]
+  },
+  {
+    "id": 6,
+    "cmd": "nodejs",
     "filename": "/home/discord/SpikeyBot-Discord/src/SpikeyBot.js",
     "note": "Release",
     "wd": "/home/discord/SpikeyBot-Discord/",
-    "args": ["--shards", "--shardmem=2048"],
+    "args": ["--shards", "--shardmem=2048", "--backup"],
     "priority": -1,
     "user": "discord"
+  },
+  {
+    "id": 7,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/monitor.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [87]
+  },
+  {
+    "id": 8,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/webhooks.js",
+    "wd": "/var/www/",
+    "note": "Development",
+    "args": [88]
+  },
+  {
+    "id": 9,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/patreon.js",
+    "note": "Release",
+    "wd": "/var/www/",
+    "args": [89]
+  },
+  {
+    "id": 10,
+    "cmd": "nodejs",
+    "filename": "/home/discord/RemBot-Discord/src/SpikeyBot.js",
+    "note": "Release (RemBot)",
+    "wd": "/home/discord/RemBot-Discord/",
+    "args": ["--botname=rembot", "--shards"],
+    "priority": 10,
+    "user": "discord"
+  },
+  {
+    "id": 11,
+    "cmd": "nodejs",
+    "filename": "/home/discord/SpikeyBot-Discord-indev/src/SpikeyBot.js",
+    "note": "Development",
+    "wd": "/home/discord/SpikeyBot-Discord-indev/",
+    "args": ["--shards=2", "--dev"],
+    "priority": 10,
+    "user": "discord"
+  },
+  {
+    "id": 12,
+    "cmd": "nodejs",
+    "filename": "/home/discord/MikuBot-Discord/src/SpikeyBot.js",
+    "note": "Release (MikuBot)",
+    "wd": "/home/discord/MikuBot-Discord/",
+    "args": ["--botname=mikubot"],
+    "priority": 10,
+    "user": "discord"
+  },
+  {
+    "id": 13,
+    "cmd": "nodejs",
+    "filename": "/var/www/servers/spikeyHRM.js",
+    "note": "Release",
+    "wd": "/var/www/",
+    "args": [79]
   }
 ]

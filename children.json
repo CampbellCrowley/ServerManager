@@ -1,7 +1,8 @@
 [
   {
+    "id": "kamino",
     "hostname": "localhost",
-    "port": 86,
-    "path": "/dev.campbellcrowley.com/socket.io/status"
+    "port": 8086,
+    "path": "/kamino.spikeybot.com/socket.io/status"
   }
 ]
