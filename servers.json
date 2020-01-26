@@ -57,7 +57,8 @@
     "wd": "/home/discord/SpikeyBot-Discord/",
     "args": ["--shards", "--shardmem=2048", "--backup"],
     "priority": -1,
-    "user": "discord"
+    "user": "discord",
+    "defaultState": "stopped"
   },
   {
     "id": 7,
@@ -91,7 +92,8 @@
     "wd": "/home/discord/RemBot-Discord/",
     "args": ["--botname=rembot", "--shards"],
     "priority": 10,
-    "user": "discord"
+    "user": "discord",
+    "defaultState": "stopped"
   },
   {
     "id": 11,
@@ -111,7 +113,8 @@
     "wd": "/home/discord/MikuBot-Discord/",
     "args": ["--botname=mikubot"],
     "priority": 10,
-    "user": "discord"
+    "user": "discord",
+    "defaultState": "stopped"
   },
   {
     "id": 13,

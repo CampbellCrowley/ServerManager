@@ -165,11 +165,14 @@ function Master() {
             currentServers[id].process.killed) &&
            currentServers[id].goalState == 'running')) {
         try {
+          let goal =
+              (!currentServers[id] && serverList[i].defaultState) || 'running';
+          if (!['running', 'stopped'].includes(goal)) goal = 'running';
           currentServers[id] = {
             process: fork(
                 serverList[i].cmd, serverList[i].filename,
                 serverList[i].wd || cwd, id),
-            goalState: 'running',
+            goalState: goal,
             currentState: 'starting',
             startTime: Date.now(),
             endTime: 0,
