@@ -123,5 +123,27 @@
     "note": "Release",
     "wd": "/var/www/",
     "args": [79]
+  },
+  {
+    "id": 14,
+    "cmd": "nodejs",
+    "filename": "/home/discord/SpikeyBot-Discord-indev/src/sharding/ShardingMaster.js",
+    "note": "Development",
+    "wd": "/home/discord/SpikeyBot-Discord-indev/",
+    "args": ["8025"],
+    "priority": 10,
+    "user": "discord",
+    "defaultState": "stopped"
+  },
+  {
+    "id": 15,
+    "cmd": "nodejs",
+    "filename": "/home/discord/SpikeyBot-Discord-indev/src/sharding/ShardingSlave.js",
+    "note": "Development",
+    "wd": "/home/discord/SpikeyBot-Discord-indev/",
+    "args": [],
+    "priority": 10,
+    "user": "discord",
+    "defaultState": "stopped"
   }
 ]
