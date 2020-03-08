@@ -1,8 +1,1 @@
-[
-  {
-    "id": "kamino",
-    "hostname": "localhost",
-    "port": 8086,
-    "path": "/kamino.spikeybot.com/socket.io/status"
-  }
-]
+[]
