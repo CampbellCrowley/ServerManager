@@ -10,6 +10,9 @@ const path = require('path');
 const config = require('./config.js').master;
 const sIoClient = require('socket.io-client');
 
+const runuser = (fs.existsSync('/usr/sbin/runuser') && '/usr/sbin/runuser') ||
+    (fs.existsSync('/sbin/runuser') && '/sbin/runuser') || 'runuser';
+
 /**
  * @classdesc Start, stops, and restarts all server processes and monitors their
  * status.
@@ -254,7 +257,7 @@ function Master() {
     if (serverList[i].user && serverList[i].user != 'root') {
       options.detached = true;
       forked = spawn(
-          'runuser', ['-u', serverList[i].user, '--', cmd, filename].concat(
+          runuser, ['-u', serverList[i].user, '--', cmd, filename].concat(
               serverList[i].args),
           options);
       options.detached = false;
