@@ -1,10 +1,44 @@
 [
   {
+    "id": 0,
+    "cmd": "node",
+    "filename": "/home/admin/SpikeyBot-Discord/src/web/HTTPS-Proxy/index.js",
+    "note": "Release",
+    "wd": "/home/admin/SpikeyBot-Discord/src/web/HTTPS-Proxy",
+    "args": [
+      "--in=443",
+      "--out=8010",
+      "--key=/root/kamino.priv",
+      "--cert=/root/kamino.cert",
+      "--verification-port=80",
+      "--are-you-up=/areyouup",
+      "--disable-domain-prepend"
+    ]
+  },
+  {
     "id": 1,
+    "cmd": "node",
+    "filename": "/home/admin/SpikeyBot-Discord/src/sharding/ShardingMaster.js",
+    "note": "Release",
+    "wd": "/home/admin/SpikeyBot-Discord",
+    "args": [],
+    "user": "admin"
+  },
+  {
+    "id": 2,
     "cmd": "node",
     "filename": "/home/admin/SpikeyBot-Discord/src/sharding/ShardingSlave.js",
     "note": "Release",
-    "wd": "/home/admin/SpikeyBot-Discord/",
+    "wd": "/home/admin/SpikeyBot-Discord",
+    "args": [],
+    "user": "admin"
+  },
+  {
+    "id": 3,
+    "cmd": "node",
+    "filename": "/home/admin/SpikeyBot-Slave/src/sharding/ShardingSlave.js",
+    "note": "Release",
+    "wd": "/home/admin/SpikeyBot-Slave",
     "args": [],
     "user": "admin"
   }
