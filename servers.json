@@ -50,17 +50,6 @@
     "args": [84]
   },
   {
-    "id": 6,
-    "cmd": "nodejs",
-    "filename": "/home/discord/SpikeyBot-Discord/src/SpikeyBot.js",
-    "note": "Release",
-    "wd": "/home/discord/SpikeyBot-Discord/",
-    "args": ["--shards", "--shardmem=2048", "--backup"],
-    "priority": -1,
-    "user": "discord",
-    "defaultState": "stopped"
-  },
-  {
     "id": 7,
     "cmd": "nodejs",
     "filename": "/var/www/servers/monitor.js",
@@ -85,38 +74,6 @@
     "args": [89]
   },
   {
-    "id": 10,
-    "cmd": "nodejs",
-    "filename": "/home/discord/RemBot-Discord/src/SpikeyBot.js",
-    "note": "Release (RemBot)",
-    "wd": "/home/discord/RemBot-Discord/",
-    "args": ["--botname=rembot", "--shards"],
-    "priority": 10,
-    "user": "discord",
-    "defaultState": "stopped"
-  },
-  {
-    "id": 11,
-    "cmd": "nodejs",
-    "filename": "/home/discord/SpikeyBot-Discord-indev/src/SpikeyBot.js",
-    "note": "Development",
-    "wd": "/home/discord/SpikeyBot-Discord-indev/",
-    "args": ["--shards=2", "--dev"],
-    "priority": 10,
-    "user": "discord"
-  },
-  {
-    "id": 12,
-    "cmd": "nodejs",
-    "filename": "/home/discord/MikuBot-Discord/src/SpikeyBot.js",
-    "note": "Release (MikuBot)",
-    "wd": "/home/discord/MikuBot-Discord/",
-    "args": ["--botname=mikubot"],
-    "priority": 10,
-    "user": "discord",
-    "defaultState": "stopped"
-  },
-  {
     "id": 13,
     "cmd": "nodejs",
     "filename": "/var/www/servers/spikeyHRM.js",
@@ -132,18 +89,36 @@
     "wd": "/home/discord/SpikeyBot-Discord-indev/",
     "args": ["8025"],
     "priority": 10,
-    "user": "discord",
-    "defaultState": "stopped"
+    "user": "discord"
   },
   {
     "id": 15,
     "cmd": "nodejs",
     "filename": "/home/discord/SpikeyBot-Discord-indev/src/sharding/ShardingSlave.js",
-    "note": "Development",
+    "note": "Development (master)",
     "wd": "/home/discord/SpikeyBot-Discord-indev/",
     "args": [],
     "priority": 10,
-    "user": "discord",
-    "defaultState": "stopped"
+    "user": "discord"
+  },
+  {
+    "id": 16,
+    "cmd": "nodejs",
+    "filename": "/home/discord/SpikeyBot-Slave-0/src/sharding/ShardingSlave.js",
+    "note": "Development (0)",
+    "wd": "/home/discord/SpikeyBot-Slave-0/",
+    "args": [],
+    "priority": 10,
+    "user": "discord"
+  },
+  {
+    "id": 17,
+    "cmd": "nodejs",
+    "filename": "/home/discord/SpikeyBot-Slave-1/src/sharding/ShardingSlave.js",
+    "note": "Development (1)",
+    "wd": "/home/discord/SpikeyBot-Slave-1/",
+    "args": [],
+    "priority": 10,
+    "user": "discord"
   }
 ]
